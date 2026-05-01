@@ -1,0 +1,13 @@
+.env*
+!.env.example
+.next/
+node_modules/
+.venv/
+.playwright-cli/
+*.log
+tsconfig.tsbuildinfo
+output/
+ffmpeg-*-essentials_build/
+__pycache__/
+*.py[cod]
+data/attempts/
