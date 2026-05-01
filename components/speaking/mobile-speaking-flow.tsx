@@ -23,20 +23,20 @@ export function PracticeHeader({ attemptsCount, onSurprise, onExam }: {
   onExam: () => void;
 }) {
   return (
-    <section className="rounded-[2rem] border border-slate-800 bg-slate-950/80 p-5 shadow-2xl shadow-black/30 sm:p-7">
+    <section className="speaking-practice-header rounded-[2rem] border border-slate-800 bg-slate-950/80 p-5 shadow-2xl shadow-black/30 sm:p-7">
       <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div className="max-w-3xl">
           <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-sm font-medium text-cyan-200">
             IELTS speaking loop
           </span>
-          <h1 className="mt-4 text-4xl font-semibold leading-none tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 className="speaking-practice-title mt-4 text-4xl font-semibold leading-none tracking-tight text-white sm:text-5xl lg:text-6xl">
             Speak. Score. Retry.
           </h1>
           <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300 sm:text-lg">
             One-tap recording, automatic raw transcript capture, strict feedback, then the next attempt without leaving the page.
           </p>
         </div>
-        <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
+        <div className="speaking-practice-actions grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:justify-end">
           <Link className="rounded-2xl border border-slate-700 px-4 py-3 text-center text-sm font-medium text-slate-200" href="/history">
             {attemptsCount} attempts
           </Link>
@@ -74,7 +74,7 @@ export function PromptCard({
   onNext: () => void;
 }) {
   return (
-    <section className="rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
+    <section className="speaking-card prompt-card-mobile rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
       <div className="flex items-start justify-between gap-3">
         <div>
           <span className="text-sm text-slate-400">Active question</span>
@@ -103,7 +103,7 @@ export function PromptCard({
         ))}
       </div>
 
-      <p className="mt-5 text-xl leading-8 text-white sm:text-2xl sm:leading-9">{prompt.question}</p>
+      <p className="prompt-question mt-5 text-xl leading-8 text-white sm:text-2xl sm:leading-9">{prompt.question}</p>
 
       <div className="mt-5 flex flex-wrap gap-2 text-sm text-slate-300">
         <span className="rounded-full border border-slate-700 px-3 py-1">Part {prompt.part}</span>
@@ -151,7 +151,7 @@ export function RecorderCard({
   const transcribing = status === "transcribing audio";
 
   return (
-    <section className="rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
+    <section className="speaking-card rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
       <div className="grid gap-5 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center">
         <button
           type="button"
@@ -205,7 +205,7 @@ export function TranscriptCard({
   onClear: () => void;
 }) {
   return (
-    <section className="rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
+    <section className="speaking-card transcript-card-mobile rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <span className="text-sm text-slate-400">Raw transcript</span>
@@ -216,6 +216,7 @@ export function TranscriptCard({
         </span>
       </div>
       <textarea
+        inputMode="text"
         className="mt-5 min-h-56 w-full resize-y rounded-3xl border border-slate-700 bg-slate-900/80 p-4 text-base leading-7 text-white outline-none ring-cyan-300/20 placeholder:text-slate-500 focus:border-cyan-300 focus:ring-4 sm:min-h-64"
         value={transcript}
         onChange={(event) => onTranscriptChange(event.target.value)}
@@ -335,7 +336,7 @@ export function MobileActionDock({
   onRetry: () => void;
 }) {
   return (
-    <div className="fixed inset-x-3 bottom-3 z-30 grid grid-cols-2 gap-2 rounded-3xl border border-slate-700 bg-slate-950/95 p-2 shadow-2xl shadow-black/40 backdrop-blur lg:hidden">
+    <div className="mobile-action-dock fixed inset-x-3 bottom-3 z-30 grid grid-cols-2 gap-2 rounded-3xl border border-slate-700 bg-slate-950/95 p-2 shadow-2xl shadow-black/40 backdrop-blur lg:hidden">
       <button type="button" className={`rounded-2xl px-4 py-4 text-sm font-bold ${isRecording ? "bg-rose-400 text-slate-950" : "bg-cyan-300 text-slate-950"}`} onClick={onToggleRecording}>
         {isRecording ? "Stop" : "Record"}
       </button>

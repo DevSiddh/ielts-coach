@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -16,11 +17,22 @@ const items = [
 
 export function SiteNav() {
   const pathname = usePathname();
+  const activeRef = useRef<HTMLAnchorElement | null>(null);
+
+  useEffect(() => {
+    activeRef.current?.scrollIntoView({ block: "nearest", inline: "center" });
+  }, [pathname]);
 
   return (
-    <nav className="nav">
+    <nav className="nav" aria-label="Primary">
       {items.map((item) => (
-        <Link key={item.href} href={item.href} className={pathname === item.href ? "active" : ""}>
+        <Link
+          key={item.href}
+          ref={pathname === item.href ? activeRef : null}
+          href={item.href}
+          className={pathname === item.href ? "active" : ""}
+          aria-current={pathname === item.href ? "page" : undefined}
+        >
           {item.label}
         </Link>
       ))}
