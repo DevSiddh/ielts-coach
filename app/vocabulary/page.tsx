@@ -1139,6 +1139,82 @@ export default function VocabularyPronunciationPage() {
             justify-items: start;
           }
         }
+
+        @media (max-width: 720px) {
+          .vocab-page {
+            gap: 12px;
+            margin: 10px 0 24px;
+          }
+
+          .vocab-header,
+          .vocab-panel,
+          .vocab-result {
+            padding: 12px;
+            border-radius: 12px;
+          }
+
+          .vocab-header h1 {
+            margin: 10px 0 6px;
+            font-size: clamp(1.8rem, 10vw, 2.5rem);
+            line-height: 1.03;
+          }
+
+          .vocab-header p,
+          .vocab-result p {
+            font-size: 1rem;
+            line-height: 1.55;
+          }
+
+          .vocab-streak {
+            min-width: 0;
+            padding: 12px;
+          }
+
+          .vocab-streak strong {
+            font-size: 2.15rem;
+          }
+
+          .vocab-word-row,
+          .vocab-toolbar,
+          .vocab-actions,
+          .vocab-playback-header {
+            display: grid;
+            grid-template-columns: 1fr;
+            align-items: stretch;
+          }
+
+          .vocab-word-row label {
+            min-width: 0;
+            flex-basis: auto;
+          }
+
+          .vocab-actions .button,
+          .vocab-result-actions .button,
+          .vocab-word-row .button {
+            width: 100%;
+            min-height: 46px;
+          }
+
+          .vocab-result h2 {
+            font-size: clamp(2rem, 15vw, 3.2rem);
+          }
+
+          .vocab-compact-section summary {
+            min-height: 44px;
+          }
+
+          .preloaded-list,
+          .sound-drill-list,
+          .family-list,
+          .problem-word-list {
+            max-height: 260px;
+            overflow: auto;
+          }
+
+          .problem-word-card > div {
+            grid-template-columns: 1fr;
+          }
+        }
       `}</style>
     </main>
   );

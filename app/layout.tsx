@@ -14,6 +14,13 @@ export const metadata = {
   }
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#05070d"
+};
+
 export default function RootLayout({
   children
 }: Readonly<{

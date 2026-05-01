@@ -28,11 +28,13 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  overflow-x: hidden;
   color: var(--text);
   background:
     radial-gradient(circle at top left, rgba(79, 144, 255, 0.22), transparent 24%),
@@ -503,7 +505,7 @@ select {
     width: min(100% - 20px, 1200px);
   }
 
-  .topbar {
+  .topbar:not(.app-topbar) {
     flex-direction: column;
     align-items: stretch;
   }
@@ -1752,7 +1754,8 @@ body {
 
 @media (max-width: 640px) {
   .app-shell {
-    width: min(100% - 20px, 1240px);
+    width: 100%;
+    padding-inline: max(10px, env(safe-area-inset-left)) max(10px, env(safe-area-inset-right));
   }
 
   .app-topbar {
@@ -2380,12 +2383,18 @@ body,
   }
 
   .app-shell {
-    width: min(100% - 16px, 1240px);
+    width: 100%;
+    padding-inline: max(10px, env(safe-area-inset-left)) max(10px, env(safe-area-inset-right));
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
   }
 
   .app-topbar {
-    gap: 10px;
-    padding: 10px 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    align-items: stretch;
+    gap: 8px;
+    padding: max(8px, env(safe-area-inset-top)) 0 8px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.1);
     background: rgba(5, 7, 13, 0.88);
   }
 
@@ -2394,14 +2403,31 @@ body,
     display: none;
   }
 
+  .brand {
+    min-height: 36px;
+    gap: 10px;
+    font-size: 1rem;
+  }
+
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+  }
+
   .nav {
     display: flex;
     justify-content: flex-start;
-    gap: 6px;
+    gap: 7px;
     width: 100%;
+    padding: 2px 0 4px;
     overflow-x: auto;
-    border-radius: 999px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    overscroll-behavior-x: contain;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
   }
 
   .nav::-webkit-scrollbar {
@@ -2410,8 +2436,14 @@ body,
 
   .nav a {
     flex: 0 0 auto;
-    padding: 9px 12px;
-    font-size: 0.88rem;
+    min-height: 34px;
+    padding: 7px 10px;
+    border: 1px solid rgba(148, 163, 184, 0.13);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.035);
+    font-size: 0.82rem;
+    line-height: 1;
+    white-space: nowrap;
   }
 
   .speaking-hero,
@@ -2428,8 +2460,16 @@ body,
   .learning-header h2,
   .attempt-summary-card h2,
   .workbench-header h2 {
-    font-size: clamp(2rem, 12vw, 3rem);
-    line-height: 0.98;
+    font-size: clamp(1.8rem, 9vw, 2.55rem);
+    line-height: 1.03;
+  }
+
+  .speaking-hero p,
+  .home-hero-panel p,
+  .learning-header p,
+  .workbench-header p {
+    font-size: 1rem;
+    line-height: 1.55;
   }
 
   .speaking-hero-actions,
@@ -2491,7 +2531,8 @@ body,
   .evidence-total-grid,
   .analysis-grid,
   .transcript-evidence,
-  .evidence-metric-grid {
+  .evidence-metric-grid,
+  .workbench-grid {
     grid-template-columns: 1fr !important;
   }
 
@@ -2542,7 +2583,7 @@ body,
 
   .writing-main-panel .console-actions {
     position: sticky;
-    bottom: 8px;
+    bottom: max(8px, env(safe-area-inset-bottom));
     z-index: 15;
     padding: 8px;
     border: 1px solid rgba(148, 163, 184, 0.14);
@@ -2570,6 +2611,31 @@ body,
     width: 100%;
   }
 
+  .home-hero-panel,
+  .speaking-hero,
+  .learning-shell,
+  .review-shell,
+  .writing-layout,
+  .evaluation-shell,
+  .practice-block,
+  .workbench-panel,
+  .surface-card,
+  .progress-panel,
+  .attempt-summary-card {
+    max-width: 100%;
+  }
+
+  .workflow-step,
+  .surface-card,
+  .strategy-card,
+  .topic-button,
+  .attempt-row,
+  .review-item,
+  .practice-prompt,
+  .improved-answer {
+    overflow-wrap: anywhere;
+  }
+
   .learning-shell,
   .review-shell,
   .writing-prompt-panel,
@@ -2586,6 +2652,22 @@ body,
 }
 
 @media (max-width: 520px) {
+  .brand {
+    font-size: 0.96rem;
+  }
+
+  .nav a {
+    min-height: 32px;
+    padding: 7px 9px;
+    font-size: 0.8rem;
+  }
+
+  .eyebrow {
+    min-height: 36px;
+    padding: 7px 10px;
+    font-size: 0.78rem;
+  }
+
   .speaking-hero-actions,
   .hero-actions,
   .console-actions,
