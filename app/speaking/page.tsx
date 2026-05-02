@@ -265,7 +265,7 @@ export default function SpeakingPage() {
             onNext={() => movePrompt(1)}
           />
 
-          <section className="rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
+          <section className="speaking-card custom-question-card rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <span className="text-sm text-slate-400">My questions</span>

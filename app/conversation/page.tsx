@@ -20,7 +20,7 @@ import {
 } from "@/features/conversation/storage";
 import type { ConversationSession } from "@/features/conversation/types";
 
-const conversationSteps = ["Introduction", "Question", "Answer", "Critique", "Retry", "Follow-up"] as const;
+const conversationSteps = ["Warm-up", "Role-play", "Answer", "Coach note", "Retry", "Follow-up"] as const;
 
 export default function ConversationPage() {
   const [state, setState] = useState(createInitialConversationState);
@@ -32,14 +32,14 @@ export default function ConversationPage() {
   const selectedSessionIdRef = useRef<string | null>(null);
   const activeStep =
     state.promptIndex < 0
-      ? "Introduction"
+      ? "Warm-up"
       : state.retryRequired
         ? "Retry"
         : state.critique
-          ? "Critique"
+          ? "Coach note"
           : state.messages.length > 1
             ? "Answer"
-            : "Question";
+            : "Role-play";
   const recorder = useSpeakingRecorder({
     onTranscript: (value) => {
       if (state.retryRequired) {
@@ -83,12 +83,19 @@ export default function ConversationPage() {
 
   useEffect(() => stopSpeaking, []);
 
+  function blurActiveInput() {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur();
+    }
+  }
+
   function handleSubmitAnswer() {
     const next = submitConversationAnswer(state, transcript);
     setState(next);
     setTranscript("");
     setRetryTranscript("");
     recorder.reset();
+    blurActiveInput();
   }
 
   function handleSubmitRetry() {
@@ -96,6 +103,7 @@ export default function ConversationPage() {
     setState(next);
     setRetryTranscript("");
     recorder.reset();
+    blurActiveInput();
   }
 
   function handleNextFollowUp() {
@@ -169,11 +177,11 @@ export default function ConversationPage() {
     <main className="conversation-workspace">
       <div className="speaking-hero">
         <div>
-          <span className="eyebrow">Conversation trainer</span>
-          <h1>Practice the examiner-style speaking flow.</h1>
-          <p>Introduction, question, critique, retry, then follow-up. No band score here.</p>
+          <span className="eyebrow">Live coach room</span>
+          <h1>Role-play IELTS speaking with Mira.</h1>
+          <p>A coach-style practice chat that listens, remembers context, pushes your answer, and keeps scoring separate.</p>
         </div>
-        <span className="status-pill">No band score</span>
+        <span className="status-pill">Coach mode</span>
       </div>
 
       <div className="conversation-flow" aria-label="Conversation workflow">
@@ -189,7 +197,7 @@ export default function ConversationPage() {
         <aside className="conversation-session-panel app-panel conversation-archive">
           <div className="panel-inner stack">
             <div className="section-title">
-              <h3>Session archive</h3>
+              <h3>Practice memory</h3>
               <span className="muted">{sessions.length} saved</span>
             </div>
             <div className="hero-actions" style={{ marginTop: 0 }}>
@@ -237,18 +245,18 @@ export default function ConversationPage() {
           <div className="panel-inner stack">
             <div className="conversation-question-card">
               <span className="mini-note">
-                {state.promptIndex < 0 ? "Introduction round" : "Current examiner prompt"}
+                {state.promptIndex < 0 ? "Warm-up" : state.retryRequired ? "Coach is waiting for the retry" : "Mira asks"}
               </span>
               <strong>{normalizeConversationMessages(state.messages).at(-1)?.role === "examiner"
                 ? normalizeConversationMessages(state.messages).at(-1)?.text
-                : "Respond to the latest examiner message, then retry if asked."}</strong>
+                : "Answer Mira like you are in a real coaching room."}</strong>
             </div>
             <div className="conversation-thread">
               {normalizeConversationMessages(state.messages).map((message, index) => (
                 <div key={`${message.id}-${index}`} className={`message-row ${message.role}`}>
                   <div className="message-bubble">
                     <div className="message-header">
-                      <span className="mini-note">{message.role === "examiner" ? "Examiner" : "You"}</span>
+                      <span className="mini-note">{message.role === "examiner" ? "Mira" : "You"}</span>
                       {message.role === "examiner" ? (
                         <button
                           type="button"
@@ -267,7 +275,7 @@ export default function ConversationPage() {
 
             <div className="practice-block conversation-composer">
               <div className="block-header">
-                <h3>{state.retryRequired ? "Retry your answer" : "Send your answer"}</h3>
+                <h3>{state.retryRequired ? "Try that again, sharper" : "Reply naturally"}</h3>
                 <span className="status-pill">
                   {recorder.status} {recorder.durationSeconds ? `- ${recorder.durationSeconds}s` : ""}
                 </span>
@@ -298,7 +306,7 @@ export default function ConversationPage() {
                 placeholder={
                   state.retryRequired
                     ? "Retry the answer here. The examiner will not continue until you retry."
-                    : "Reply to the examiner. You can record, transcribe, or type."
+                    : "Talk to Mira. You can record, transcribe, or type."
                 }
               />
               <div className="console-actions">
@@ -318,7 +326,7 @@ export default function ConversationPage() {
                     onClick={handleSubmitAnswer}
                     disabled={!transcript.trim()}
                   >
-                    Send answer
+                    Send
                   </button>
                 )}
                 <button
@@ -343,8 +351,8 @@ export default function ConversationPage() {
         <aside className="app-panel conversation-feedback-panel">
           <div className="panel-inner stack">
             <div className="section-title">
-              <h3>Next action</h3>
-              <span className="muted">Professional workflow</span>
+              <h3>Coach board</h3>
+              <span className="muted">Live read</span>
             </div>
             {state.critique ? (
               <>
@@ -396,7 +404,7 @@ export default function ConversationPage() {
               </>
             ) : (
               <div className="list-item">
-                Submit an answer to receive one short target, an upgrade, and a required retry.
+                Mira will react to your answer, show one useful pattern, and give you a small speaking rep.
               </div>
             )}
           </div>

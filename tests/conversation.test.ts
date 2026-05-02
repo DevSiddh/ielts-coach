@@ -25,27 +25,27 @@ const question = "What kind of place is your hometown?";
 
 function createReadyConversationState() {
   let state = createInitialConversationState();
-  state = submitConversationAnswer(state, "My full name is Rahul Sharma.");
-  state = submitConversationAnswer(state, "Please call me Rahul.");
+  state = submitConversationAnswer(state, "My full name is Rahul Sharma, please call me Rahul.");
   state = submitConversationAnswer(state, "I am from Pune.");
   return submitConversationAnswer(state, "I am studying computer science.");
 }
 
-test("conversation starts with examiner-style introduction", () => {
+test("conversation starts with coach-style introduction", () => {
   const state = createInitialConversationState();
   assert.equal(state.promptIndex, -1);
   assert.equal(state.messages[0].kind, "introduction");
   assert.equal(state.currentQuestion, introductionQuestions[0]);
+  assert.match(state.currentQuestion, /Mira/);
 });
 
-test("introduction answers move through identity questions without scoring retry", () => {
+test("introduction answers feel conversational and skip redundant name question", () => {
   let state = createInitialConversationState();
-  state = submitConversationAnswer(state, "My full name is Rahul Sharma.");
+  state = submitConversationAnswer(state, "My full name is Rahul Sharma, you can call me Rahul.");
   assert.equal(state.retryRequired, false);
   assert.equal(state.critique, null);
-  assert.equal(state.currentQuestion, introductionQuestions[1]);
+  assert.equal(state.currentQuestion, introductionQuestions[2]);
+  assert.equal(state.messages.at(-1)?.text.includes("Nice, Rahul"), true);
 
-  state = submitConversationAnswer(state, "Please call me Rahul.");
   state = submitConversationAnswer(state, "I am from Pune.");
   state = submitConversationAnswer(state, "I am studying computer science.");
   assert.equal(state.promptIndex, 0);
@@ -53,10 +53,30 @@ test("introduction answers move through identity questions without scoring retry
   assert.equal(state.messages.at(-1)?.kind, "question");
 });
 
+test("location answer is not misread as preferred name", () => {
+  let state = createInitialConversationState();
+  state = submitConversationAnswer(state, "My name is Yagnesh, call me Siddhu.");
+  state = submitConversationAnswer(state, "I am from Vijayawada.");
+  assert.equal(state.currentQuestion, introductionQuestions[3]);
+  assert.equal(state.messages.at(-1)?.text.includes("Vijayawada, got it."), true);
+  assert.equal(state.messages.at(-1)?.text.includes("Nice, From"), false);
+});
+
+test("work and study answer is not misread as preferred name", () => {
+  let state = createInitialConversationState();
+  state = submitConversationAnswer(state, "My name is Yagnesh, call me Siddhu.");
+  state = submitConversationAnswer(state, "I am from Vijayawada.");
+  state = submitConversationAnswer(state, "I am working on software projects and studying for IELTS.");
+  assert.equal(state.promptIndex, 0);
+  assert.equal(state.messages.at(-1)?.kind, "question");
+  assert.equal(state.messages.at(-1)?.text.includes("Nice, Working"), false);
+  assert.equal(state.messages.at(-1)?.text.includes("Good, that gives me your study context."), true);
+});
+
 test("short answer targets development", () => {
   const critique = buildConversationCritique({ question, transcript: "It is nice." });
   assert.equal(critique.target, "development");
-  assert.equal(critique.evidence[0], "Only 3 words detected.");
+  assert.equal(critique.evidence[0], "Part 1 interview needs more development: only 3 words detected.");
 });
 
 test("filler-heavy answer targets fluency", () => {
@@ -73,6 +93,7 @@ test("repeated weak vocabulary targets vocabulary", () => {
     transcript: "My hometown is good because people are good and the market is very very useful."
   });
   assert.equal(critique.target, "vocabulary");
+  assert.doesNotMatch(critique.upgradedAnswer, /quite quite/);
 });
 
 test("repeated starts target recovery", () => {
@@ -92,6 +113,32 @@ test("normal answer targets structure", () => {
   assert.equal(critique.target, "structure");
 });
 
+test("part 2 critique coaches long-turn development", () => {
+  const critique = buildConversationCritique({
+    question: "Describe a website you often use.",
+    transcript: "I use one study website because it helps me.",
+    part: 2,
+    sourceLabel: "verified-2026"
+  });
+  assert.equal(critique.target, "development");
+  assert.equal(critique.evidence[0], "Part 2 long turn needs more development: only 9 words detected.");
+  assert.match(critique.upgradedAnswer, /one-to-two-minute long turn/);
+  assert.match(critique.retryPrompt, /scene -> 2 details -> why it mattered/);
+});
+
+test("part 3 critique gives analytical model direction", () => {
+  const critique = buildConversationCritique({
+    question: "Do you think online learning will become more common in the future?",
+    transcript:
+      "I think online learning will become more common because it is flexible for workers and students. For example, people can study after office hours, repeat recorded lessons, and choose courses from other cities. However, classroom learning will still matter because it gives stronger discipline, direct support, and better interaction.",
+    part: 3,
+    yearLabel: "2026"
+  });
+  assert.equal(critique.target, "structure");
+  assert.match(critique.upgradedAnswer, /not a simple yes-or-no issue/);
+  assert.match(critique.retryPrompt, /clear opinion -> because -> example -> however/);
+});
+
 test("first answer requires retry", () => {
   const state = submitConversationAnswer(createReadyConversationState(), "It is nice.");
   assert.equal(state.retryRequired, true);
@@ -99,7 +146,17 @@ test("first answer requires retry", () => {
   assert.equal(state.turns.length, 1);
   assert.equal(state.messages.at(-1)?.role, "examiner");
   assert.equal(state.messages.at(-1)?.kind, "critique");
-  assert.equal(state.messages.at(-1)?.text.includes("Now retry:"), true);
+  assert.equal(state.messages.at(-1)?.text.includes("Now do the small rep:"), true);
+});
+
+test("candidate help request gets a coach nudge instead of canned critique", () => {
+  const state = submitConversationAnswer(createReadyConversationState(), "I don't know what should I say.");
+  assert.equal(state.retryRequired, false);
+  assert.equal(state.critique, null);
+  assert.equal(state.messages.at(-1)?.kind, "follow-up");
+  assert.match(state.messages.at(-1)?.text ?? "", /starting hook/);
+  assert.match(state.messages.at(-1)?.text ?? "", /same question/);
+  assert.doesNotMatch(state.messages.at(-1)?.text ?? "", /Rahul From/);
 });
 
 test("retry unlocks follow-up", () => {
@@ -108,7 +165,8 @@ test("retry unlocks follow-up", () => {
   assert.equal(retried.retryRequired, false);
   assert.equal(retried.turns[0].retryTranscript, "My hometown is peaceful because people know each other.");
   assert.equal(retried.messages.at(-1)?.role, "examiner");
-  assert.equal(retried.messages.at(-1)?.text.startsWith("Better."), true);
+  assert.equal(retried.messages.at(-1)?.text.startsWith("That is more alive."), true);
+  assert.match(retried.messages.at(-1)?.text ?? "", /expanded it from 3 to 9 words/);
 });
 
 test("next follow-up advances question after retry", () => {

@@ -74,7 +74,7 @@ export function PromptCard({
   onNext: () => void;
 }) {
   return (
-    <section className="speaking-card prompt-card-mobile rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6">
+    <section className={`speaking-card prompt-card-mobile prompt-card-part-${prompt.part} rounded-[1.75rem] border border-slate-800 bg-slate-950/80 p-4 sm:p-6`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <span className="text-sm text-slate-400">Active question</span>
@@ -105,14 +105,14 @@ export function PromptCard({
 
       <p className="prompt-question mt-5 text-xl leading-8 text-white sm:text-2xl sm:leading-9">{prompt.question}</p>
 
-      <div className="mt-5 flex flex-wrap gap-2 text-sm text-slate-300">
+      <div className="prompt-meta-chips mt-5 flex flex-wrap gap-2 text-sm text-slate-300">
         <span className="rounded-full border border-slate-700 px-3 py-1">Part {prompt.part}</span>
         <span className="rounded-full border border-slate-700 px-3 py-1">{timingTarget}</span>
         <span className="rounded-full border border-slate-700 px-3 py-1">{practiceMode === "exam" ? "Exam" : practiceMode === "surprise" ? "Surprise" : "Guided"}</span>
         <span className="rounded-full border border-slate-700 px-3 py-1">{prompt.yearLabel}</span>
       </div>
 
-      <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
+      <div className="prompt-topic-strip mt-5 flex gap-2 overflow-x-auto pb-1">
         {visiblePrompts.map((item, index) => (
           <button
             key={item.id}
